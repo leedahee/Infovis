@@ -1,0 +1,20 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(stringr)
+data = read_csv('pollution_us_2000_2016.csv')
+data %>% distinct(State) %>% summarize(n())
+data %>% group_by(County) %>% summarize(n())
+data %>% group_by(City) %>% summarize(n())
+new = data %>% mutate(Year = str_sub(`Date Local`, 1,4)) %>% group_by(State, Year) %>% select(State, Year,`NO2 AQI`) %>% mutate(average = mean(`NO2 AQI`)) %>% distinct(State,Year, average) %>% spread(Year, average)#%>% distinct(State, City,average)
+new
+write_csv(new, 'new_pollution.csv')
+
+```
+
+
+
