@@ -183,16 +183,18 @@ d3.csv("new_pollution.csv", function(err, data) {
 
                 dataArray[Object.keys(data[0])[i]] = valueFormat(dataMap[id_name_map[d.id]][Object.keys(data[0])[i]]);
               }
-
+               dataArray = [dataArray] 
+              //console.log(html)
               console.log(dataArray)
 
-              dataArray2 = [{2001: 40, 2002: 40},{2003: 40, 2004: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40}]
+//dataArray2 = [{2001: 40, 2002: 40},{2001: 40, 2002: 40}]
 
               YearList = [2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016]
 
               var svgWidth=900;
               var svgHeight=200;
-              var subChartWidth=svgWidth/16;
+              var subChartWidth=svgWidth/dataArray.length;
+              console.log(subChartWidth)
 
               //////////////////plot bar charts/////////////////////
               //settings for bar chart
@@ -200,6 +202,13 @@ d3.csv("new_pollution.csv", function(err, data) {
               var spaceBetweenBar=5;
               var yStartLoc=120; // the top offset from canvas to the bottom of the bar.
               var width=10; //width of bar
+
+              var heightRange = {min:0, max:120}
+
+              var heightScale = d3.scale.linear()
+                .domain([0,100])
+                .range([heightRange.min, heightRange.max]);
+
 
               var dataCompDIV = d3.select('body')
                   .append('div')
@@ -216,41 +225,40 @@ d3.csv("new_pollution.csv", function(err, data) {
                   .data(dataArray)
                   .enter();
 
+                  //sdfdf
+
               // var dataCompHeightScale=d3.scale.linear()
               //     .domain([dataArray.min,dataArray.max])
               //     .range([0, 100]);
 
-              function plotEachBar(xStart,year){
-                  var barForSingleState=dataCompG
-                      .append('rect')
-                      .attr('class',"YearList")
-                      .attr('x',function(d,i){
-                          return xStartLoc+xStart+d[year]
-                      })
-                      .attr('y',function(d){
-                          return yStartLoc-20
-                      })
-                      .attr('height',function(d){
-                          return 20
-                      })
-                      .attr('width',width)
-                      .style('fill','blue');
+        colorList=["green","green","green", "green", "green","green","green", "green", "green","green","green", "green", "green","green","green", "green"];
 
-                  var labelForSingleState=dataCompG.append('text')
-                      // .text("P"+year.slice(-1))
-                      .attr('x',function(d,i){
-                          return xStartLoc+xStart+i*subChartWidth
-                      })
-                      .attr('y',yStartLoc+10)
-                      .attr("font-size","8pt");
+        function plotEachBar(colorofBar, xStart, fieldName) {
 
-                  return (barForSingleState,labelForSingleState)
-              }
+            var barForSingleProject = dataCompG
+                .append('rect')
+                .attr('class', fieldName)
+                .attr('x', function(d,i){return xStartLoc+xStart+i*subChartWidth})
+                .attr('y', function(d){return yStartLoc - heightScale(d[fieldName])})
+                .attr('height', function(d){return heightScale(d[fieldName])})
+                .attr('width', width)
+                .style('fill', colorofBar);
 
-              for (let i in YearList){
-                plotEachBar(i*(width+spaceBetweenBar),YearList[i])
-              }
-              
+            // var labelForEach = chartCompG.append('text')
+            //     .text(fieldName)
+            //     .attr('x', function(d,i){ return xStartLoc+xStart+i*subChartWidth})
+            //     .attr('y', yStartLoc+10)
+
+            return (barForSingleProject)
+
+        }
+        for(let i in YearList){
+          plotEachBar(colorList[i],i*(width+spaceBetweenBar),YearList[i])
+
+    }
+
+
+
               
               $("#tooltip-container").html(html);
               $(this).attr("fill-opacity", "0.7");
@@ -275,6 +283,8 @@ d3.csv("new_pollution.csv", function(err, data) {
                   $(this).attr("fill-opacity", "1.0");
                   $("#tooltip-container").hide();
               });
+
+
     
       svg.append("path")
           .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
