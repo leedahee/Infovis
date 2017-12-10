@@ -158,7 +158,7 @@ d3.csv("new_pollution.csv", function(err, data) {
             }
           })
           .attr("d", path)
-          .on("mousemove", function(d) {
+          .on("click", function(d) {
               var html = "";
               var dataArray = {};
 
@@ -184,18 +184,73 @@ d3.csv("new_pollution.csv", function(err, data) {
                 dataArray[Object.keys(data[0])[i]] = valueFormat(dataMap[id_name_map[d.id]][Object.keys(data[0])[i]]);
               }
 
-              //console.log(html)
               console.log(dataArray)
 
+              dataArray2 = [{2001: 40, 2002: 40},{2003: 40, 2004: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40},{2001: 40, 2002: 40}]
 
+              YearList = [2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016]
 
+              var svgWidth=900;
+              var svgHeight=200;
+              var subChartWidth=svgWidth/16;
 
+              //////////////////plot bar charts/////////////////////
+              //settings for bar chart
+              var xStartLoc=30; //the left offset from canvas to the first bar
+              var spaceBetweenBar=5;
+              var yStartLoc=120; // the top offset from canvas to the bottom of the bar.
+              var width=10; //width of bar
 
+              var dataCompDIV = d3.select('body')
+                  .append('div')
+                  .attr("class","barCharts");
 
+              var dataCompTitle=dataCompDIV.append('h3')
+                  .text("Bar Charts")
 
+              var dataCompSVG=dataCompDIV.append('svg')
+                  .attr('width', svgWidth)
+                  .attr('height', svgHeight);
 
+              var dataCompG=dataCompSVG.selectAll('rect')
+                  .data(dataArray)
+                  .enter();
 
+              // var dataCompHeightScale=d3.scale.linear()
+              //     .domain([dataArray.min,dataArray.max])
+              //     .range([0, 100]);
 
+              function plotEachBar(xStart,year){
+                  var barForSingleState=dataCompG
+                      .append('rect')
+                      .attr('class',"YearList")
+                      .attr('x',function(d,i){
+                          return xStartLoc+xStart+d[year]
+                      })
+                      .attr('y',function(d){
+                          return yStartLoc-20
+                      })
+                      .attr('height',function(d){
+                          return 20
+                      })
+                      .attr('width',width)
+                      .style('fill','blue');
+
+                  var labelForSingleState=dataCompG.append('text')
+                      // .text("P"+year.slice(-1))
+                      .attr('x',function(d,i){
+                          return xStartLoc+xStart+i*subChartWidth
+                      })
+                      .attr('y',yStartLoc+10)
+                      .attr("font-size","8pt");
+
+                  return (barForSingleState,labelForSingleState)
+              }
+
+              for (let i in YearList){
+                plotEachBar(i*(width+spaceBetweenBar),YearList[i])
+              }
+              
               
               $("#tooltip-container").html(html);
               $(this).attr("fill-opacity", "0.7");
