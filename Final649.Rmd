@@ -1,0 +1,41 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(stringr)
+library(lubridate)
+data = read_csv('pollution_us_2000_2016.csv')
+head(data)
+one= data[!duplicated(data[,c('Date Local')]),]
+head(one) 
+new2= one %>% 
+  select('State Code', 'County Code', 'Site Num', 'Address','State', 'County', 'City','Date Local', 'NO2 Mean', 'NO2 AQI','O3 Mean', 'O3 AQI', 'SO2 Mean','SO2 AQI', 'CO Mean', 'CO AQI' ) 
+
+aggregate(cbind(NO2 Mean,O3 Mean, SO2 Mean, CO Mean)~month(Date Local), data=new2,FUN=sum)
+
+
+
+
+
+new2 %>%
+mutate(month = format(`Date Local`, "%m"), year = format(`Date Local`, "%Y")) %>% 
+  group_by(month)%>% 
+  mutate(monthNO = mean(`NO2 AQI`)) %>% 
+  mutate(monthO3 = mean(`O3 AQI`)) %>% 
+  mutate(monthO2 = mean(`SO2 AQI`)) %>% 
+  mutate(monthCO = mean(`CO AQI`))
+  
+
+
+
+
+head(new2)
+write_csv(new2, 'new_pollution3.csv')
+
+```
+
+
+
