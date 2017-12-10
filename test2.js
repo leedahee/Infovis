@@ -160,6 +160,9 @@ d3.csv("new_pollution.csv", function(err, data) {
           .attr("d", path)
           .on("mousemove", function(d) {
               var html = "";
+              var dataArray = {};
+
+              //dataArray += id_name_map[d.id];
     
               html += "<div class=\"tooltip_kv\">";
               html += "<span class=\"tooltip_key\">";
@@ -177,7 +180,22 @@ d3.csv("new_pollution.csv", function(err, data) {
                 html += "";
                 html += "</span>";
                 html += "</div>";
+
+                dataArray[Object.keys(data[0])[i]] = valueFormat(dataMap[id_name_map[d.id]][Object.keys(data[0])[i]]);
               }
+
+              //console.log(html)
+              console.log(dataArray)
+
+
+
+
+
+
+
+
+
+
               
               $("#tooltip-container").html(html);
               $(this).attr("fill-opacity", "0.7");
@@ -218,5 +236,7 @@ d3.csv("new_pollution.csv", function(err, data) {
   
   
   });
+
   });
+
 });
