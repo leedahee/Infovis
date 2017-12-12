@@ -10,9 +10,18 @@ data = read_csv('pollution_us_2000_2016.csv')
 data %>% distinct(State) %>% summarize(n())
 data %>% group_by(County) %>% summarize(n())
 data %>% group_by(City) %>% summarize(n())
-new = data %>% mutate(Year = str_sub(`Date Local`, 1,4)) %>% group_by(State, Year) %>% select(State, Year,`NO2 AQI`) %>% mutate(average = mean(`NO2 AQI`)) %>% distinct(State,Year, average) %>% spread(Year, average)#%>% distinct(State, City,average)
-new
-write_csv(new, 'new_pollution.csv')
+# new = data %>% mutate(Year = str_sub(`Date Local`, 1,4)) %>% group_by(State, County, Year) %>% select(State, Year, County, `CO Mean`, `NO2 Mean`,`SO2 Mean`, `O3 Mean`) %>% mutate(avg_co = mean(`CO Mean`), avg_no2 = mean(`NO2 Mean`),avg_so2 = mean(`SO2 Mean`),avg_o3 = mean(`O3 Mean`) ) %>% distinct(State,Year,avg_co,avg_no2, avg_so2, avg_o3) %>% filter(Year != '2016')
+new = data %>% mutate(Year = str_sub(`Date Local`, 1,4)) %>% 
+      group_by(State, County, Year) %>% 
+      select(State, Year, County, `CO AQI`, `NO2 AQI`,`SO2 AQI`, `O3 AQI`) %>% 
+      mutate(CO = mean(`CO AQI`), NO2 = mean(`NO2 AQI`), SO2 = mean(`SO2 AQI`), O3 = mean(`O3 AQI`) ) %>%  
+      distinct(State,Year,County,CO,NO2, SO2, O3) %>% filter(Year != '2016') %>% 
+      gather(`CO`,`NO2`,`SO2`,`O3`,key="Pollutant Types", value="Average Pollution") %>% 
+      filter(`Pollutant Types` != "CO" & `Pollutant Types` != "SO2" )
+
+#%>% spread(Year, average) #%>% distinct(State, City,average)#, avg_O3 = mean(`O3 Mean`), avg_SO2 = mean(`SO2 Mean`), avg_CO = mean(`CO Mean`)) %>% distinct(State,Year,avg_NO2,avg_O3, avg_SO2, avg_CO) %>% spread(Year, avg_NO2)#%>% distinct(State, City,average)
+#ne
+write_csv(new, 'new_pollution_all.csv')
 
 ```
 
